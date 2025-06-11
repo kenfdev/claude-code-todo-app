@@ -2,13 +2,14 @@
 
 ## プロジェクト概要
 
-TypeScript + React Router v7 + SQLite を使用したWebアプリケーションプロジェクト。Cloudflareにデプロイします。
+TypeScript + React Router v7 + SQLite を使用したシンプルなToDo Webアプリケーションプロジェクト。Cloudflareにデプロイします。
 
 ## 技術スタック
 
 - **言語**: TypeScript (厳格な型安全性を保持)
 - **フレームワーク**: React Router v7
-- **データベース**: SQLite (development/production両対応)
+- **データベース**: SQLite (development/production両対応)。productionではD1を使用。
+- **ORM**: Drizzle ORM
 - **デプロイ**: Cloudflare Pages/Workers
 - **パッケージマネージャー**: npm
 
