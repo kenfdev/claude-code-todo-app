@@ -5,3 +5,5 @@ export const guestBook = sqliteTable("guestBook", {
   name: text().notNull(),
   email: text().notNull().unique(),
 });
+
+export * from "./auth-schema";

@@ -26,6 +26,9 @@ RUN apt update && apt install -y less \
 RUN mkdir -p /usr/local/share/npm-global && \
   chown -R node:node /usr/local/share
 
+# Install Playwright dependencies
+RUN npx playwright install-deps chromium
+
 ARG USERNAME=node
 
 # Persist bash history.
@@ -72,6 +75,10 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 # Install Claude
 RUN npm install -g @anthropic-ai/claude-code
+
+# Install Playwright
+RUN npx playwright install chromium
+ENV PLAYWRIGHT_HTML_HOST=0.0.0.0
 
 # Copy and set up firewall script
 COPY init-firewall.sh /usr/local/bin/
