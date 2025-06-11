@@ -56,7 +56,8 @@ for domain in \
     "api.anthropic.com" \
     "sentry.io" \
     "statsig.anthropic.com" \
-    "statsig.com"; do
+    "statsig.com" \
+    "marketplace.cursorapi.com" ; do
     echo "Resolving $domain..."
     ips=$(dig +short A "$domain")
     if [ -z "$ips" ]; then
@@ -73,6 +74,20 @@ for domain in \
         ipset add allowed-domains "$ip"
     done < <(echo "$ips")
 done
+
+# Resolve and add host.docker.internal
+echo "Resolving host.docker.internal..."
+host_docker_ips=$(dig +short A host.docker.internal 2>/dev/null || true)
+if [ -n "$host_docker_ips" ]; then
+    while read -r ip; do
+        if [[ "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            echo "Adding $ip for host.docker.internal"
+            ipset add allowed-domains "$ip"
+        fi
+    done < <(echo "$host_docker_ips")
+else
+    echo "Warning: Could not resolve host.docker.internal"
+fi
 
 # Get host IP from default route
 HOST_IP=$(ip route | grep default | cut -d" " -f3)
