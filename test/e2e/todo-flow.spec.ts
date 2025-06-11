@@ -28,16 +28,16 @@ test.describe("Todo Creation Flow", () => {
     await page.click("text=新しいTodoを作成");
 
     // Verify the form is displayed
-    await expect(page.locator("text=Create Task")).toBeVisible();
+    await expect(page.locator("text=タスク作成")).toBeVisible();
 
     // Fill out the todo form
-    await page.fill('input[placeholder="Enter task name"]', "Buy groceries");
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Buy groceries");
     await page.fill('input[type="date"]', "2024-12-31");
     await page.selectOption('select', "high");
-    await page.fill('textarea[placeholder="Add notes"]', "Need to buy milk, bread, and eggs");
+    await page.fill('textarea[placeholder="メモを追加してください"]', "Need to buy milk, bread, and eggs");
 
     // Submit the form
-    await page.click('button:has-text("Add Task")');
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify the todo was created and appears in the list
     await expect(page.locator("text=Buy groceries")).toBeVisible();
@@ -59,7 +59,7 @@ test.describe("Todo Creation Flow", () => {
     await page.click("text=新しいTodoを作成");
 
     // Try to submit without entering a title
-    await page.click('button:has-text("Add Task")');
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify validation error is shown
     await expect(page.locator("text=タイトルは必須です")).toBeVisible();
@@ -71,8 +71,8 @@ test.describe("Todo Creation Flow", () => {
   test("should allow user to complete a todo", async ({ page }) => {
     // First create a todo
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Complete me");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Complete me");
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify todo is created
     await expect(page.locator("text=Complete me")).toBeVisible();
@@ -88,9 +88,9 @@ test.describe("Todo Creation Flow", () => {
   test("should allow user to edit a todo", async ({ page }) => {
     // First create a todo
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Original title");
-    await page.fill('textarea[placeholder="Add notes"]', "Original description");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Original title");
+    await page.fill('textarea[placeholder="メモを追加してください"]', "Original description");
+    await page.click('button:has-text("タスクを追加")');
 
     // Click edit button
     await page.click('button[title="編集"]');
@@ -112,8 +112,8 @@ test.describe("Todo Creation Flow", () => {
   test("should allow user to delete a todo", async ({ page }) => {
     // First create a todo
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Delete me");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Delete me");
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify todo is created
     await expect(page.locator("text=Delete me")).toBeVisible();
@@ -136,8 +136,8 @@ test.describe("Todo Creation Flow", () => {
   test("should persist todos across page reloads", async ({ page }) => {
     // Create a todo
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Persistent todo");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Persistent todo");
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify todo is created
     await expect(page.locator("text=Persistent todo")).toBeVisible();
@@ -156,8 +156,8 @@ test.describe("Todo Creation Flow", () => {
 
     // Try to create a todo
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Failed todo");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Failed todo");
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify error message is shown
     await expect(page.locator("text=エラーが発生しました")).toBeVisible();
@@ -172,8 +172,8 @@ test.describe("Todo Creation Flow", () => {
 
     // Create a todo to ensure we have access to protected functionality
     await page.click("text=新しいTodoを作成");
-    await page.fill('input[placeholder="Enter task name"]', "Auth test todo");
-    await page.click('button:has-text("Add Task")');
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Auth test todo");
+    await page.click('button:has-text("タスクを追加")');
 
     // Verify todo creation succeeded (proves authentication is working)
     await expect(page.locator("text=Auth test todo")).toBeVisible();

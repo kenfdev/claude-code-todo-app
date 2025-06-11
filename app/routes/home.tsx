@@ -61,7 +61,13 @@ export default function Home({ actionData, loaderData }: Route.ComponentProps) {
   );
 }
 
-function HomeContent({ actionData, loaderData }: Route.ComponentProps) {
+function HomeContent({ 
+  actionData, 
+  loaderData 
+}: { 
+  actionData: Route.ComponentProps['actionData'];
+  loaderData: Route.ComponentProps['loaderData'];
+}) {
   const { user, logout } = useSession();
   const { todos, loading, error, createTodo, updateTodo, deleteTodo, toggleComplete, clearError } = useTodos();
   const [showForm, setShowForm] = useState(false);

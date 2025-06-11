@@ -4,6 +4,7 @@ import { beforeAll, afterAll, beforeEach } from 'vitest'
 import Database from 'better-sqlite3'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
+import * as schema from '../database/schema'
 
 // Make React available globally for JSX
 global.React = React
@@ -64,10 +65,23 @@ beforeAll(() => {
     );
     
     CREATE UNIQUE INDEX password_reset_tokens_token_hash_unique ON password_reset_tokens (token_hash);
+    
+    CREATE TABLE todos (
+      id TEXT PRIMARY KEY NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      completed INTEGER DEFAULT 0 NOT NULL,
+      priority TEXT DEFAULT 'medium' NOT NULL,
+      due_date TEXT,
+      user_id TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
   `)
   
-  // Create Drizzle instance
-  drizzleDb = drizzle(testDb)
+  // Create Drizzle instance with schema
+  drizzleDb = drizzle(testDb, { schema })
   
   // Make database instances globally available
   global.testDb = testDb
@@ -77,6 +91,7 @@ beforeAll(() => {
 beforeEach(() => {
   // Clear all tables before each test
   testDb.exec(`
+    DELETE FROM todos;
     DELETE FROM password_reset_tokens;
     DELETE FROM sessions;
     DELETE FROM users;
@@ -169,6 +184,22 @@ global.fetch = vi.fn()
 // Mock btoa/atob with real implementation
 global.btoa = (str: string) => Buffer.from(str).toString('base64')
 global.atob = (str: string) => Buffer.from(str, 'base64').toString()
+
+// Add test database helper functions
+export function createTestDatabase() {
+  return drizzleDb
+}
+
+export function cleanupTestDatabase(db: BetterSQLite3Database) {
+  // Clear all tables
+  testDb.exec(`
+    DELETE FROM todos;
+    DELETE FROM password_reset_tokens;
+    DELETE FROM sessions;  
+    DELETE FROM users;
+  `)
+  return Promise.resolve()
+}
 
 // Add type declarations
 declare global {

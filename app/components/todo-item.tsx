@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Todo, TodoPriority } from "../types/todo";
+import { formatDate } from "../utils/date";
 
 interface TodoItemProps {
   todo: Todo;
@@ -23,7 +24,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
     try {
       await onToggleComplete(todo.id, !todo.completed);
     } catch (error) {
-      console.error("Failed to toggle todo completion:", error);
+      console.error("Todo完了状態の切り替えに失敗しました:", error);
     } finally {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
       });
       setIsEditing(false);
     } catch (error) {
-      console.error("Failed to update todo:", error);
+      console.error("Todoの更新に失敗しました:", error);
     } finally {
       setLoading(false);
     }
@@ -79,7 +80,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
     try {
       await onDelete(todo.id);
     } catch (error) {
-      console.error("Failed to delete todo:", error);
+      console.error("Todoの削除に失敗しました:", error);
     } finally {
       setLoading(false);
     }
@@ -111,13 +112,6 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}/${month}/${day}`;
-  };
 
   if (isEditing) {
     return (

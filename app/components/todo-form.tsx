@@ -64,7 +64,7 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
       });
       setValidationErrors({});
     } catch (err) {
-      console.error("Todo creation failed:", err);
+      console.error("タスク作成に失敗しました:", err);
     }
   };
 
@@ -83,7 +83,7 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Create Task</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">タスク作成</h2>
       
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -95,15 +95,14 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
         {/* Task Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Task Details
+            タスク名
           </label>
-          <p className="text-sm text-gray-500 mb-2">Task Name</p>
           <div className="relative">
             <input
               type="text"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Enter task name"
+              placeholder="タスク名を入力してください"
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               disabled={loading}
             />
@@ -121,9 +120,8 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
         {/* Due Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Task Details
+            期限日
           </label>
-          <p className="text-sm text-gray-500 mb-2">Due Date</p>
           <div className="relative">
             <input
               type="date"
@@ -146,9 +144,8 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
         {/* Priority */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Task Details
+            優先度
           </label>
-          <p className="text-sm text-gray-500 mb-2">Priority</p>
           <div className="relative">
             <select
               value={formData.priority}
@@ -156,9 +153,9 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
               disabled={loading}
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">低優先度</option>
+              <option value="medium">中優先度</option>
+              <option value="high">高優先度</option>
             </select>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,14 +168,13 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
         {/* Notes */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Task Details
+            メモ
           </label>
-          <p className="text-sm text-gray-500 mb-2">Notes</p>
           <div className="relative">
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Add notes"
+              placeholder="メモを追加してください"
               rows={3}
               className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
               disabled={loading}
@@ -211,7 +207,7 @@ export function TodoForm({ onSubmit, loading = false, error }: TodoFormProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             )}
-            {loading ? "Creating..." : "Add Task"}
+            {loading ? "作成中..." : "タスクを追加"}
           </button>
         </div>
       </form>
