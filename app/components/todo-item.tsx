@@ -113,11 +113,10 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}/${month}/${day}`;
   };
 
   if (isEditing) {
@@ -190,6 +189,8 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
         <button
           onClick={handleToggleComplete}
           disabled={loading}
+          role="checkbox"
+          aria-checked={todo.completed}
           className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
             todo.completed
               ? "bg-indigo-600 border-indigo-600"
@@ -226,6 +227,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
                   <button
                     onClick={handleEdit}
                     disabled={loading}
+                    title="編集"
                     className="text-gray-400 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,6 +238,7 @@ export function TodoItem({ todo, onToggleComplete, onUpdate, onDelete }: TodoIte
                   <button
                     onClick={handleDelete}
                     disabled={loading}
+                    title="削除"
                     className="text-gray-400 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

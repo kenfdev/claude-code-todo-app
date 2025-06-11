@@ -4,6 +4,7 @@ import type { Route } from "./+types/home";
 import { Welcome } from "../welcome/welcome";
 import { ProtectedRoute } from "../components/protected-route";
 import { useAuthContext } from "../components/auth-provider";
+import { useSession } from "../hooks/use-session";
 import { Link, Navigate } from "react-router";
 import { useState } from "react";
 import { TodoForm } from "../components/todo-form";
@@ -53,13 +54,21 @@ export async function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ actionData, loaderData }: Route.ComponentProps) {
-  const { user, logout } = useAuthContext();
+  return (
+    <ProtectedRoute>
+      <HomeContent actionData={actionData} loaderData={loaderData} />
+    </ProtectedRoute>
+  );
+}
+
+function HomeContent({ actionData, loaderData }: Route.ComponentProps) {
+  const { user, logout } = useSession();
   const { todos, loading, error, createTodo, updateTodo, deleteTodo, toggleComplete, clearError } = useTodos();
   const [showForm, setShowForm] = useState(false);
 
-  // Redirect to login if not authenticated
+  // Add safety check for user
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <div>Loading...</div>;
   }
 
   const handleCreateTodo = async (todoData: any) => {
@@ -120,7 +129,10 @@ export default function Home({ actionData, loaderData }: Route.ComponentProps) {
         {/* Error Display */}
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex justify-between items-center">
-            <span>{error}</span>
+            <div>
+              <span>エラーが発生しました</span>
+              <div className="text-sm mt-1">{error}</div>
+            </div>
             <button
               onClick={clearError}
               className="text-red-700 hover:text-red-900"

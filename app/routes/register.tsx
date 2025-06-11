@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth";
-import type { RegisterRequest } from "../types/auth";
+import type { RegisterRequest, RegisterFormData as RegisterFormDataType } from "../types/auth";
 
 const registerSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -18,7 +18,7 @@ const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type RegisterFormData = z.infer<typeof registerSchema>;
+type LocalRegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
+  } = useForm<LocalRegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
@@ -39,12 +39,11 @@ export default function RegisterPage() {
     }
   }, [user, navigate]);
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: LocalRegisterFormData) => {
     clearError();
     try {
-      // Remove confirmPassword before sending to API
-      const { confirmPassword, ...registerData } = data;
-      await registerUser(registerData);
+      // Send all data including confirmPassword to API (API will handle validation and removal)
+      await registerUser(data);
       navigate("/", { replace: true });
     } catch (err) {
       // Error handling is done by useAuth hook

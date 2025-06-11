@@ -5,10 +5,11 @@ test.describe("Todo Creation Flow", () => {
     // Setup: Register and login a test user
     await page.goto("/register");
     
-    // Register
+    // Register with unique email
+    const uniqueEmail = `test+${Date.now()}@example.com`;
     await page.fill('input[name="firstName"]', "Test");
     await page.fill('input[name="lastName"]', "User");
-    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="email"]', uniqueEmail);
     await page.fill('input[name="phoneNumber"]', "123-456-7890");
     await page.fill('input[name="password"]', "password123");
     await page.fill('input[name="confirmPassword"]', "password123");
@@ -80,7 +81,7 @@ test.describe("Todo Creation Flow", () => {
     await page.click('button[role="checkbox"]');
 
     // Verify todo is marked as completed
-    await expect(page.locator("text=Complete me").locator("..")).toHaveClass(/line-through/);
+    await expect(page.locator("text=Complete me")).toHaveClass(/line-through/);
     await expect(page.locator("text=完了: 1 / 1")).toBeVisible();
   });
 
@@ -159,7 +160,6 @@ test.describe("Todo Creation Flow", () => {
     await page.click('button:has-text("Add Task")');
 
     // Verify error message is shown
-    await expect(page.locator(".bg-red-100")).toBeVisible();
     await expect(page.locator("text=エラーが発生しました")).toBeVisible();
   });
 

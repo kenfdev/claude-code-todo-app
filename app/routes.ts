@@ -10,4 +10,6 @@ export default [
   route("/api/auth/logout", "routes/api.auth.logout.ts"),
   route("/api/auth/refresh", "routes/api.auth.refresh.ts"),
   route("/api/auth/forgot-password", "routes/api.auth.forgot-password.ts"),
+  route("/api/todos", "routes/api.todos.ts"),
+  route("/api/todos/:id", "routes/api.todos.$id.ts"),
 ] satisfies RouteConfig;
