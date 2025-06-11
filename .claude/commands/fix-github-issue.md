@@ -12,4 +12,4 @@ Follow these steps:
 8. Push and create a PR in Japanese
 
 Remember to use the GitHub CLI (`gh`) for all GitHub-related tasks.
-ALWAYS create a new branch from the `main` branch. ALWAYS pull the `oritin/main` branch so it is ALWAYS up to date.
+ALWAYS create a new branch from the `main` branch. ALWAYS pull the `origin/main` branch so it is ALWAYS up to date.
