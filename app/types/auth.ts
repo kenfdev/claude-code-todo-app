@@ -23,6 +23,10 @@ export interface RegisterRequest {
   phoneNumber?: string;
 }
 
+export interface RegisterFormData extends RegisterRequest {
+  confirmPassword: string;
+}
+
 export interface AuthResponse {
   success: true;
   data: {
