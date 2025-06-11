@@ -17,6 +17,12 @@ test.describe("Todo Creation Flow", () => {
     
     // Should redirect to home page after successful registration
     await expect(page).toHaveURL("/");
+    
+    // Wait for network to settle and authentication state to be established
+    await page.waitForLoadState('networkidle');
+    
+    // Ensure user is authenticated by checking for the greeting
+    await expect(page.locator("text=こんにちは、Test Userさん")).toBeVisible();
   });
 
   test("should allow user to create a new todo", async ({ page }) => {
@@ -164,7 +170,10 @@ test.describe("Todo Creation Flow", () => {
   });
 
   test("should maintain authentication state", async ({ page }) => {
-    // Verify user is logged in
+    // Wait for the page to load completely and authentication to be established
+    await page.waitForLoadState('networkidle');
+    
+    // Verify user is logged in - the format is firstName lastName, so "Test User"
     await expect(page.locator("text=こんにちは、Test Userさん")).toBeVisible();
     
     // Verify logout button is available
