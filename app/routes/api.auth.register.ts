@@ -6,9 +6,13 @@ import type { RegisterRequest, AuthResponse, AuthErrorResponse } from "../types/
 const registerSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
   password: z.string().min(8, "パスワードは8文字以上で入力してください"),
+  confirmPassword: z.string().min(1, "パスワードの確認を入力してください"),
   firstName: z.string().min(1, "名前を入力してください"),
   lastName: z.string().min(1, "苗字を入力してください"),
   phoneNumber: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "パスワードが一致しません",
+  path: ["confirmPassword"],
 });
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -29,8 +33,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
     const formData = await request.json();
     const validatedData = registerSchema.parse(formData);
 
+    // Remove confirmPassword before passing to service
+    const { confirmPassword, ...registerData } = validatedData;
+
     const authService = new AuthService(context.cloudflare.env.DB);
-    const user = await authService.register(validatedData);
+    const user = await authService.register(registerData);
 
     // Generate token for immediate login after registration
     const accessToken = await authService.generateAccessToken({

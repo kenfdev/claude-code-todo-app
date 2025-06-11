@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth";
 import type { RegisterRequest } from "../types/auth";
@@ -8,9 +9,13 @@ import type { RegisterRequest } from "../types/auth";
 const registerSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
   password: z.string().min(8, "パスワードは8文字以上で入力してください"),
+  confirmPassword: z.string().min(1, "パスワードの確認を入力してください"),
   firstName: z.string().min(1, "名前を入力してください"),
   lastName: z.string().min(1, "苗字を入力してください"),
   phoneNumber: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "パスワードが一致しません",
+  path: ["confirmPassword"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -23,7 +28,9 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>();
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
 
   // Redirect if already logged in
   React.useEffect(() => {
@@ -35,14 +42,12 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     clearError();
     try {
-      const validation = registerSchema.parse(data);
-      await registerUser(validation);
+      // Remove confirmPassword before sending to API
+      const { confirmPassword, ...registerData } = data;
+      await registerUser(registerData);
       navigate("/", { replace: true });
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        // Validation errors are handled by react-hook-form
-        return;
-      }
+      // Error handling is done by useAuth hook
     }
   };
 
@@ -143,6 +148,24 @@ export default function RegisterPage() {
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                パスワード（確認）
+              </label>
+              <input
+                {...register("confirmPassword")}
+                type="password"
+                autoComplete="new-password"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  errors.confirmPassword ? "border-red-300" : "border-gray-300"
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                placeholder="パスワードを再入力"
+              />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
               )}
             </div>
           </div>
