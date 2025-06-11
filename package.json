@@ -15,16 +15,23 @@
     "typecheck": "npm run cf-typegen && react-router typegen && tsc -b"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "drizzle-orm": "~0.36.3",
     "isbot": "^5.1.27",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.1.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.5.3"
+    "react-hook-form": "^7.57.0",
+    "react-router": "^7.5.3",
+    "zod": "^3.25.58"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.0.12",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
