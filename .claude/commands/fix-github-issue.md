@@ -8,7 +8,7 @@ Follow these steps:
 4. Implement the necessary changes to fix the issue
 5. Write and run tests to verify the fix
 6. Ensure code passes linting and type checking
-7. Create a descriptive commit message in Japanese
-8. Push and create a PR
+7. Create a descriptive commit message
+8. Push and create a PR in Japanese
 
 Remember to use the GitHub CLI (`gh`) for all GitHub-related tasks.
