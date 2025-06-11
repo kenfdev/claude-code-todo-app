@@ -13,3 +13,7 @@
 # Reviews directory (exclude all except .gitkeep)
 /reviews/*
 !/reviews/.gitkeep
+
+# Playwright
+/playwright-report/
+/test-results/
