@@ -15,6 +15,13 @@
       "when": 1749618861037,
       "tag": "0001_shocking_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1749630304641,
+      "tag": "0002_omniscient_silver_fox",
+      "breakpoints": true
     }
   ]
 }
