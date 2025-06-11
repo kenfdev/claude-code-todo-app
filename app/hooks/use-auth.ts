@@ -3,6 +3,7 @@ import type {
   User, 
   LoginRequest, 
   RegisterRequest, 
+  RegisterFormData,
   AuthResponse, 
   AuthErrorResponse,
   RefreshTokenResponse 
@@ -18,7 +19,7 @@ interface AuthState {
 
 interface AuthActions {
   login: (credentials: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  register: (data: RegisterRequest | RegisterFormData) => Promise<void>;
   logout: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
   clearError: () => void;
@@ -35,30 +36,26 @@ export function useAuth(): AuthState & AuthActions {
 
   // Load auth state from localStorage on mount
   useEffect(() => {
-    const loadAuthState = () => {
-      try {
-        const storedAccessToken = localStorage.getItem("accessToken");
-        const storedRefreshToken = localStorage.getItem("refreshToken");
-        const storedUser = localStorage.getItem("user");
+    try {
+      const storedAccessToken = localStorage.getItem("accessToken");
+      const storedRefreshToken = localStorage.getItem("refreshToken");
+      const storedUser = localStorage.getItem("user");
 
-        if (storedAccessToken && storedRefreshToken && storedUser) {
-          setState(prev => ({
-            ...prev,
-            accessToken: storedAccessToken,
-            refreshToken: storedRefreshToken,
-            user: JSON.parse(storedUser),
-            isLoading: false,
-          }));
-        } else {
-          setState(prev => ({ ...prev, isLoading: false }));
-        }
-      } catch (error) {
-        console.error("Error loading auth state:", error);
+      if (storedAccessToken && storedUser) {
+        setState({
+          user: JSON.parse(storedUser),
+          accessToken: storedAccessToken,
+          refreshToken: storedRefreshToken,
+          isLoading: false,
+          error: null,
+        });
+      } else {
         setState(prev => ({ ...prev, isLoading: false }));
       }
-    };
-
-    loadAuthState();
+    } catch (error) {
+      console.error("Error loading auth state:", error);
+      setState(prev => ({ ...prev, isLoading: false }));
+    }
   }, []);
 
   const saveAuthState = useCallback((user: User, accessToken: string, refreshToken?: string) => {
@@ -115,7 +112,7 @@ export function useAuth(): AuthState & AuthActions {
     }
   }, [saveAuthState]);
 
-  const register = useCallback(async (data: RegisterRequest) => {
+  const register = useCallback(async (data: RegisterRequest | RegisterFormData) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -178,6 +175,8 @@ export function useAuth(): AuthState & AuthActions {
         isLoading: false,
         error: null,
       });
+      // Force redirect to login page
+      window.location.href = "/login";
     }
   }, [state.accessToken, clearAuthState]);
 
