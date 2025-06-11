@@ -9,6 +9,7 @@ import { Link, Navigate } from "react-router";
 import { useState } from "react";
 import { TodoForm } from "../components/todo-form";
 import { TodoList } from "../components/todo-list";
+import { TodoTabs } from "../components/todo-tabs";
 import { useTodos } from "../hooks/use-todos";
 
 export function meta({}: Route.MetaArgs) {
@@ -71,6 +72,7 @@ function HomeContent({
   const { user, logout } = useSession();
   const { todos, loading, error, createTodo, updateTodo, deleteTodo, toggleComplete, clearError } = useTodos();
   const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
 
   // Add safety check for user
   if (!user) {
@@ -205,25 +207,46 @@ function HomeContent({
             </div>
             
             <div className="bg-white rounded-lg shadow">
-              {todos.length === 0 && !loading ? (
-                <div className="p-8 text-center">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">Todoがありません</h3>
-                  <p className="mt-1 text-sm text-gray-500">最初のTodoを作成してみましょう。</p>
-                </div>
-              ) : (
-                <div className="p-4">
-                  <TodoList
-                    todos={todos}
-                    loading={loading}
-                    onToggleComplete={handleToggleComplete}
-                    onUpdate={handleUpdateTodo}
-                    onDelete={handleDeleteTodo}
-                  />
-                </div>
-              )}
+              <div className="p-4">
+                <TodoTabs
+                  activeTab={activeTab}
+                  activeTodosCount={todos.filter(t => !t.completed).length}
+                  completedTodosCount={todos.filter(t => t.completed).length}
+                  onTabChange={setActiveTab}
+                />
+                
+                {(() => {
+                  const filteredTodos = activeTab === 'active' 
+                    ? todos.filter(t => !t.completed)
+                    : todos.filter(t => t.completed);
+                  
+                  if (filteredTodos.length === 0 && !loading) {
+                    return (
+                      <div className="p-8 text-center">
+                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">
+                          {activeTab === 'active' ? '未完了のTodoがありません' : '完了したTodoがありません'}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {activeTab === 'active' ? '新しいTodoを作成してみましょう。' : 'Todoを完了させると、ここに表示されます。'}
+                        </p>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <TodoList
+                      todos={filteredTodos}
+                      loading={loading}
+                      onToggleComplete={handleToggleComplete}
+                      onUpdate={handleUpdateTodo}
+                      onDelete={handleDeleteTodo}
+                    />
+                  );
+                })()}
+              </div>
             </div>
           </div>
         </div>

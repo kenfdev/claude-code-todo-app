@@ -91,6 +91,42 @@ test.describe("Todo Creation Flow", () => {
     await expect(page.locator("text=完了: 1 / 1")).toBeVisible();
   });
 
+  test("should switch between active and completed todo tabs", async ({ page }) => {
+    // Create two todos
+    await page.click("text=新しいTodoを作成");
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Active todo");
+    await page.click('button:has-text("タスクを追加")');
+    
+    await page.click("text=新しいTodoを作成");
+    await page.fill('input[placeholder="タスク名を入力してください"]', "Todo to complete");
+    await page.click('button:has-text("タスクを追加")');
+
+    // Complete one todo
+    await page.click('button[role="checkbox"]:first');
+
+    // Verify tabs are displayed with correct counts
+    await expect(page.locator("text=未完了 (1)")).toBeVisible();
+    await expect(page.locator("text=完了 (1)")).toBeVisible();
+
+    // Verify active tab shows only uncompleted todo
+    await expect(page.locator("text=Active todo")).toBeVisible();
+    await expect(page.locator("text=Todo to complete")).not.toBeVisible();
+
+    // Switch to completed tab
+    await page.click("text=完了 (1)");
+
+    // Verify completed tab shows only completed todo
+    await expect(page.locator("text=Todo to complete")).toBeVisible();
+    await expect(page.locator("text=Active todo")).not.toBeVisible();
+
+    // Switch back to active tab
+    await page.click("text=未完了 (1)");
+
+    // Verify active tab shows only uncompleted todo again
+    await expect(page.locator("text=Active todo")).toBeVisible();
+    await expect(page.locator("text=Todo to complete")).not.toBeVisible();
+  });
+
   test("should allow user to edit a todo", async ({ page }) => {
     // First create a todo
     await page.click("text=新しいTodoを作成");
