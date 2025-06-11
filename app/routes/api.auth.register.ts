@@ -33,7 +33,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     const user = await authService.register(validatedData);
 
     // Generate token for immediate login after registration
-    const accessToken = authService.generateAccessToken({
+    const accessToken = await authService.generateAccessToken({
       userId: user.id,
       email: user.email,
     });

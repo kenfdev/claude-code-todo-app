@@ -21,7 +21,9 @@ export function useSession(options: UseSessionOptions = {}) {
   // Parse JWT to get expiration time
   const getTokenExpiration = useCallback((token: string): number | null => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
       return payload.exp * 1000; // Convert to milliseconds
     } catch {
       return null;

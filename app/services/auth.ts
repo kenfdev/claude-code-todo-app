@@ -2,8 +2,6 @@ import { drizzle } from "drizzle-orm/d1";
 import { eq, and } from "drizzle-orm";
 import { users, sessions, passwordResetTokens } from "../../database/schema";
 import { nanoid } from "nanoid";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import type { 
   User, 
   LoginRequest, 
@@ -24,35 +22,133 @@ export class AuthService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 12);
+    // Generate a random salt
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const encoder = new TextEncoder();
+    
+    // Combine password and salt
+    const passwordBuffer = encoder.encode(password);
+    const combined = new Uint8Array(passwordBuffer.length + salt.length);
+    combined.set(passwordBuffer);
+    combined.set(salt, passwordBuffer.length);
+    
+    // Hash the combined data
+    const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const saltArray = Array.from(salt);
+    
+    // Return salt + hash as hex string
+    const saltHex = saltArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return saltHex + ':' + hashHex;
   }
 
-  async comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+  async comparePassword(password: string, storedHash: string): Promise<boolean> {
+    const [saltHex, hashHex] = storedHash.split(':');
+    if (!saltHex || !hashHex) return false;
+    
+    // Convert salt from hex
+    const salt = new Uint8Array(saltHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+    
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
+    const combined = new Uint8Array(passwordBuffer.length + salt.length);
+    combined.set(passwordBuffer);
+    combined.set(salt, passwordBuffer.length);
+    
+    // Hash the combined data
+    const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const computedHashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    return computedHashHex === hashHex;
   }
 
-  generateAccessToken(payload: Omit<TokenPayload, "iat" | "exp">): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  async generateAccessToken(payload: Omit<TokenPayload, "iat" | "exp">): Promise<string> {
+    const now = Math.floor(Date.now() / 1000);
+    const exp = now + 15 * 60; // 15 minutes
+    
+    const header = {
+      alg: "HS256",
+      typ: "JWT"
+    };
+    
+    const fullPayload = {
+      ...payload,
+      iat: now,
+      exp: exp
+    };
+    
+    const encoder = new TextEncoder();
+    const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const payloadB64 = btoa(JSON.stringify(fullPayload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    
+    const data = encoder.encode(`${headerB64}.${payloadB64}`);
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(JWT_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    const signature = await crypto.subtle.sign('HMAC', key, data);
+    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+      .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    
+    return `${headerB64}.${payloadB64}.${signatureB64}`;
   }
 
   generateRefreshToken(): string {
     return nanoid(64);
   }
 
-  verifyAccessToken(token: string): TokenPayload | null {
+  async verifyAccessToken(token: string): Promise<TokenPayload | null> {
     try {
-      return jwt.verify(token, JWT_SECRET) as TokenPayload;
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      
+      const [headerB64, payloadB64, signatureB64] = parts;
+      
+      // Verify signature
+      const encoder = new TextEncoder();
+      const data = encoder.encode(`${headerB64}.${payloadB64}`);
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(JWT_SECRET),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['verify']
+      );
+      
+      const signature = Uint8Array.from(atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+      const isValid = await crypto.subtle.verify('HMAC', key, signature, data);
+      
+      if (!isValid) return null;
+      
+      // Parse payload
+      const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/'))) as TokenPayload;
+      
+      // Check expiration
+      if (payload.exp < Math.floor(Date.now() / 1000)) return null;
+      
+      return payload;
     } catch {
       return null;
     }
   }
 
   async hashToken(token: string): Promise<string> {
-    return bcrypt.hash(token, 10);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(token);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   async compareToken(token: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(token, hash);
+    const hashedToken = await this.hashToken(token);
+    return hashedToken === hash;
   }
 
   async register(data: RegisterRequest): Promise<User> {
@@ -136,7 +232,7 @@ export class AuthService {
       .where(eq(users.id, user.id));
 
     // Generate tokens
-    const accessToken = this.generateAccessToken({
+    const accessToken = await this.generateAccessToken({
       userId: user.id,
       email: user.email,
     });
@@ -178,7 +274,7 @@ export class AuthService {
   }
 
   async logout(accessToken: string): Promise<void> {
-    const tokenPayload = this.verifyAccessToken(accessToken);
+    const tokenPayload = await this.verifyAccessToken(accessToken);
     if (!tokenPayload) {
       return; // Token is invalid, nothing to logout
     }
@@ -226,7 +322,7 @@ export class AuthService {
     }
 
     // Generate new tokens
-    const newAccessToken = this.generateAccessToken({
+    const newAccessToken = await this.generateAccessToken({
       userId: user.id,
       email: user.email,
     });
@@ -255,7 +351,7 @@ export class AuthService {
   }
 
   async validateSession(accessToken: string): Promise<User | null> {
-    const tokenPayload = this.verifyAccessToken(accessToken);
+    const tokenPayload = await this.verifyAccessToken(accessToken);
     if (!tokenPayload) {
       return null;
     }
