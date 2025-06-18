@@ -9,6 +9,7 @@ export interface Todo {
 
 interface TodoListProps {
   todos: Todo[];
+  activeTab?: string;
 }
 
 export function TodoList({ todos }: TodoListProps) {
