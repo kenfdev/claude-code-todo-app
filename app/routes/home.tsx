@@ -3,6 +3,7 @@ import { TodoList } from "../components/TodoList";
 import { AddTaskButton } from "../components/AddTaskButton";
 import { getAllTodos, toggleTodoComplete, getIncompleteTodos, getCompletedTodos } from "../lib/db";
 import { useSearchParams } from "react-router";
+import type { TabType } from "../types";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,7 +15,8 @@ export function meta({}: Route.MetaArgs) {
 export async function loader({ context, request }: Route.LoaderArgs) {
   try {
     const url = new URL(request.url);
-    const tab = url.searchParams.get("tab") || "incomplete";
+    const tabParam = url.searchParams.get("tab");
+    const tab: TabType = (tabParam === "completed" || tabParam === "incomplete") ? tabParam : "incomplete";
     
     let todos;
     if (tab === "completed") {
@@ -27,7 +29,7 @@ export async function loader({ context, request }: Route.LoaderArgs) {
   } catch (error) {
     console.error("Failed to load todos:", error);
     // Return empty array as fallback
-    return { todos: [], activeTab: "incomplete" };
+    return { todos: [], activeTab: "incomplete" as TabType };
   }
 }
 
@@ -53,8 +55,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = loaderData.activeTab || "incomplete";
   
-  const handleTabChange = (tab: string) => {
-    setSearchParams({ tab });
+  const handleTabChange = (tab: TabType) => {
+    // Use View Transitions API if available for smoother transitions
+    if ('startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        setSearchParams({ tab });
+      });
+    } else {
+      setSearchParams({ tab });
+    }
   };
   
   return (

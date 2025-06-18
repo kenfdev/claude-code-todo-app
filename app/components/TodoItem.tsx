@@ -1,5 +1,5 @@
 import { useFetcher } from "react-router";
-import type { Todo } from "./TodoList";
+import type { Todo } from "../types";
 
 interface TodoItemProps {
   todo: Todo;

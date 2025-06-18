@@ -13,3 +13,34 @@ body {
     color-scheme: dark;
   }
 }
+
+/* View Transitions API support for smooth tab transitions */
+@supports (view-transition-name: auto) {
+  [role="list"] {
+    view-transition-name: todo-list;
+  }
+  
+  ::view-transition-old(todo-list),
+  ::view-transition-new(todo-list) {
+    animation-duration: 300ms;
+    animation-timing-function: ease-in-out;
+  }
+  
+  ::view-transition-old(todo-list) {
+    animation-name: fade-out;
+  }
+  
+  ::view-transition-new(todo-list) {
+    animation-name: fade-in;
+  }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
