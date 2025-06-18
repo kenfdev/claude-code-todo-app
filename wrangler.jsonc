@@ -9,8 +9,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "your-database-name",
-      "database_id": "your-database-id",
+      "database_name": "todo-db",
+      "database_id": "1e619cca-8fc4-4fd3-b94e-f9b6f3913d32",
       "migrations_dir": "drizzle"
     }
   ]

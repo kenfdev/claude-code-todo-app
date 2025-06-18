@@ -9,7 +9,9 @@
 # Cloudflare
 .mf
 .wrangler
+.env
 
 # reviews
 /reviews/*
 !reviews/.gitkeep
+
