@@ -4,8 +4,8 @@ import { TodoList } from "../../app/components/TodoList";
 
 describe("TodoList", () => {
   const mockTodos = [
-    { id: "1", title: "Test Todo 1", description: "Description 1", completed: false },
-    { id: "2", title: "Test Todo 2", description: "Description 2", completed: true },
+    { id: "1", title: "Test Todo 1", notes: "Notes 1", completed: false },
+    { id: "2", title: "Test Todo 2", notes: "Notes 2", completed: true },
   ];
 
   it("renders a list of todos", () => {
@@ -19,9 +19,9 @@ describe("TodoList", () => {
     render(<TodoList todos={mockTodos} />);
     
     expect(screen.getByText("Test Todo 1")).toBeInTheDocument();
-    expect(screen.getByText("Description 1")).toBeInTheDocument();
+    expect(screen.getByText("Notes 1")).toBeInTheDocument();
     expect(screen.getByText("Test Todo 2")).toBeInTheDocument();
-    expect(screen.getByText("Description 2")).toBeInTheDocument();
+    expect(screen.getByText("Notes 2")).toBeInTheDocument();
   });
 
   it("renders empty list when no todos", () => {
@@ -51,7 +51,7 @@ describe("TodoList", () => {
   });
 
   it("renders correct number of separators for multiple todos", () => {
-    const threeTodos = [...mockTodos, { id: "3", title: "Test Todo 3", description: "Description 3", completed: false }];
+    const threeTodos = [...mockTodos, { id: "3", title: "Test Todo 3", notes: "Notes 3", completed: false }];
     const { container } = render(<TodoList todos={threeTodos} />);
     
     const separators = container.querySelectorAll("hr");
