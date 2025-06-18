@@ -3,7 +3,7 @@ import { TodoItem } from "./TodoItem";
 export interface Todo {
   id: string;
   title: string;
-  description: string;
+  notes?: string | null;
   completed: boolean;
 }
 

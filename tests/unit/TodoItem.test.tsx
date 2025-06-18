@@ -6,22 +6,22 @@ describe("TodoItem", () => {
   const incompleteTodo = {
     id: "1",
     title: "Test Todo",
-    description: "Test Description",
+    notes: "Test Notes",
     completed: false,
   };
 
   const completedTodo = {
     id: "2",
     title: "Completed Todo",
-    description: "Completed Description",
+    notes: "Completed Notes",
     completed: true,
   };
 
-  it("renders todo item with title and description", () => {
+  it("renders todo item with title and notes", () => {
     render(<TodoItem todo={incompleteTodo} />);
     
     expect(screen.getByText("Test Todo")).toBeInTheDocument();
-    expect(screen.getByText("Test Description")).toBeInTheDocument();
+    expect(screen.getByText("Test Notes")).toBeInTheDocument();
   });
 
   it("renders checkbox with correct state for incomplete todo", () => {
@@ -52,5 +52,18 @@ describe("TodoItem", () => {
     const label = screen.getByText("Test Todo");
     expect(label.tagName).toBe("LABEL");
     expect(label).toHaveAttribute("for", "todo-1");
+  });
+
+  it("does not render notes when not provided", () => {
+    const todoWithoutNotes = {
+      id: "3",
+      title: "Todo without notes",
+      completed: false,
+    };
+    
+    render(<TodoItem todo={todoWithoutNotes} />);
+    
+    expect(screen.getByText("Todo without notes")).toBeInTheDocument();
+    expect(screen.queryByText("Test Notes")).not.toBeInTheDocument();
   });
 });

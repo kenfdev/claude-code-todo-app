@@ -25,9 +25,11 @@ export function TodoItem({ todo }: TodoItemProps) {
         >
           {todo.title}
         </label>
-        <p className="mt-1 text-sm text-[rgba(46,24,20,0.62)] dark:text-gray-400">
-          {todo.description}
-        </p>
+        {todo.notes && (
+          <p className="mt-1 text-sm text-[rgba(46,24,20,0.62)] dark:text-gray-400">
+            {todo.notes}
+          </p>
+        )}
       </div>
     </div>
   );

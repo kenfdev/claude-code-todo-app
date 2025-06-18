@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { TodoList } from "../components/TodoList";
 import { AddTaskButton } from "../components/AddTaskButton";
+import { getAllTodos } from "../lib/db";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,15 +10,18 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-const todos = [
-  { id: "1", title: "Grocery Shopping", description: "Buy vegetables and fruits", completed: false },
-  { id: "2", title: "Finish Report", description: "Due by EOD", completed: false },
-  { id: "3", title: "Call Plumber", description: "Fix kitchen sink", completed: false },
-  { id: "4", title: "Workout", description: "1 hour of cardio", completed: false },
-  { id: "5", title: "Read Book", description: "Chapter 5 of 'Atomic Habits'", completed: false }
-];
+export async function loader({ context }: Route.LoaderArgs) {
+  try {
+    const todos = await getAllTodos(context.db);
+    return { todos };
+  } catch (error) {
+    console.error("Failed to load todos:", error);
+    // Return empty array as fallback
+    return { todos: [] };
+  }
+}
 
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-3xl mx-auto p-6">
@@ -27,7 +31,7 @@ export default function Home() {
           </h1>
         </header>
         <main>
-          <TodoList todos={todos} />
+          <TodoList todos={loaderData.todos} />
         </main>
         <AddTaskButton />
       </div>

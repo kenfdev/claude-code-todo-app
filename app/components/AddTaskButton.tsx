@@ -1,8 +1,10 @@
+import { Link } from "react-router";
+
 export function AddTaskButton() {
   return (
-    <button
-      type="button"
-      className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-[#4e3cdb] text-white shadow-lg hover:bg-[#4334b8] focus:outline-none focus:ring-2 focus:ring-[#4e3cdb] focus:ring-offset-2 transition-colors"
+    <Link
+      to="/new"
+      className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-[#4e3cdb] text-white shadow-lg hover:bg-[#4334b8] focus:outline-none focus:ring-2 focus:ring-[#4e3cdb] focus:ring-offset-2 transition-colors flex items-center justify-center"
       aria-label="Add new task"
     >
       <svg
@@ -11,7 +13,6 @@ export function AddTaskButton() {
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="mx-auto"
       >
         <path
           d="M12 5V19M5 12H19"
@@ -21,6 +22,6 @@ export function AddTaskButton() {
           strokeLinejoin="round"
         />
       </svg>
-    </button>
+    </Link>
   );
 }

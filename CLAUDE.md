@@ -80,7 +80,46 @@ todo-app/
 
 ## Development Workflow
 
-- Run typecheck and lint after completing tasks and be sure they ALWAYS pass.
+### Mandatory Quality Checks
+Before considering any task complete, you MUST run the following commands and ensure they ALL pass:
+
+1. **TypeScript Type Checking**: `npm run typecheck`
+   - Must pass with zero errors
+   - Catches compatibility issues (e.g., Node.js vs Cloudflare Workers APIs)
+   - Validates route types and component interfaces
+
+2. **Unit Tests**: `npm run test`
+   - All tests must pass
+   - Validates component behavior and integration
+   - Ensures no regressions in existing functionality
+
+3. **Build Validation**: `npm run build`
+   - Must complete successfully
+   - Validates production build compatibility
+   - Catches runtime environment issues
+
+### Development Server Testing
+After making changes, always verify:
+- `npm run dev` starts without errors
+- Application loads correctly in browser
+- New functionality works as expected
+- No console errors or warnings
+
+### Critical Environment Considerations
+- **Cloudflare Workers Runtime**: Use Web APIs instead of Node.js APIs
+  - ✅ Use `crypto.randomUUID()` (Web Crypto API)
+  - ❌ Avoid `import { randomUUID } from "crypto"` (Node.js)
+  - ✅ Use `fetch()` for HTTP requests
+  - ❌ Avoid Node.js built-in modules in component code
+
+### Pre-Commit Checklist
+Before committing code, verify:
+- [ ] `npm run typecheck` passes
+- [ ] `npm run test` passes  
+- [ ] `npm run dev` starts without errors
+- [ ] `npm run build` completes successfully
+- [ ] New functionality tested manually
+- [ ] No breaking changes to existing features
 
 ## Database Schema
 
@@ -89,6 +128,7 @@ todo-app/
 CREATE TABLE todos (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
+  notes TEXT,
   completed BOOLEAN DEFAULT FALSE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -113,10 +153,30 @@ CREATE TABLE todos (
 
 ## Common Issues & Solutions
 
-1. **React Router v7 + Vitest**: Disable router in test environment
-2. **D1 local development**: Use `--local` flag for all D1 commands
-3. **TypeScript errors with D1**: Ensure `@cloudflare/workers-types` is installed
-4. **E2E test failures**: Check if dev server is running on correct port
+1. **Cloudflare Workers Runtime Errors**: 
+   - **Issue**: "Failed to load url crypto" or "Unexpected Node.js imports"
+   - **Solution**: Use Web APIs instead of Node.js modules
+   - **Example**: Use `crypto.randomUUID()` instead of `import { randomUUID } from "crypto"`
+
+2. **React Router v7 + Vitest**: 
+   - **Issue**: Router hooks fail in tests
+   - **Solution**: Wrap components in `MemoryRouter` or mock React Router components
+
+3. **D1 local development**: 
+   - **Issue**: Database operations fail locally
+   - **Solution**: Use `--local` flag for all D1 commands
+
+4. **TypeScript errors with D1**: 
+   - **Issue**: Missing type definitions
+   - **Solution**: Ensure `@cloudflare/workers-types` is installed and run `npm run cf-typegen`
+
+5. **E2E test failures**: 
+   - **Issue**: Tests can't connect to dev server
+   - **Solution**: Check if dev server is running on correct port
+
+6. **Missing Route Types**:
+   - **Issue**: Cannot find module './+types/routename'
+   - **Solution**: Add route to `app/routes.ts` and run `npx react-router typegen`
 
 ## Security Considerations
 
