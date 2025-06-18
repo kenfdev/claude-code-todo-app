@@ -15,3 +15,6 @@
 /reviews/*
 !reviews/.gitkeep
 
+# playwright
+/playwright-report/
+/test-results/

@@ -15,7 +15,10 @@
     "typecheck": "npm run cf-typegen && react-router typegen && tsc -b",
     "test": "vitest",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "npm run test && npm run test:e2e"
   },
   "dependencies": {
     "drizzle-orm": "~0.36.3",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.0.12",
+    "@playwright/test": "^1.53.0",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@testing-library/jest-dom": "^6.6.3",
