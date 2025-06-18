@@ -48,6 +48,10 @@ RUN ARCH=$(dpkg --print-architecture) && \
   sudo dpkg -i "git-delta_0.18.2_${ARCH}.deb" && \
   rm "git-delta_0.18.2_${ARCH}.deb"
 
+# Add playwright dependencies
+RUN npx playwright install-deps chromium
+ENV PLAYWRIGHT_HTML_HOST=0.0.0.0
+
 # Set up non-root user
 USER node
 
