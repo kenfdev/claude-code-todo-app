@@ -41,6 +41,13 @@ ENV DEVCONTAINER=true
 RUN mkdir -p /workspace /home/node/.claude && \
   chown -R node:node /workspace /home/node/.claude
 
+RUN mkdir -p /home/node/.config/gh && \
+  chown -R node:node /home/node/.config && \
+  chown -R node:node /home/node/.config/gh
+
+RUN mkdir -p /home/node/.config/wrangler && \
+  chown -R node:node /home/node/.config/wrangler
+
 WORKDIR /workspace
 
 RUN ARCH=$(dpkg --print-architecture) && \
