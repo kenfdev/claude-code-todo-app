@@ -1,7 +1,5 @@
-import { randomUUID } from "crypto";
-
 export function generateId(): string {
-  return randomUUID();
+  return crypto.randomUUID();
 }
 
 export function cn(...classes: (string | undefined | null | false)[]): string {
