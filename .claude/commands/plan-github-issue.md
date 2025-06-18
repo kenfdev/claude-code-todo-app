@@ -6,6 +6,6 @@ Follow these steps:
 2. Understand the problem described in the issue
 3. Search the codebase for relevant files
 4. Plan the necessary changes to fix the issue
-5. ALWAYS create a new sub-issue in the issue $ARGUMENTS as "実装計画" in Japanese. No exceptions are acceptable. YOU MUST create the issue as a sub-issue.
+5. ALWAYS create a new issue as "<original issue title>[実装計画]" in Japanese and close the original issue $ARGUMENTS.
 
 Remember to use the GitHub CLI (`gh`) for all GitHub-related tasks.
