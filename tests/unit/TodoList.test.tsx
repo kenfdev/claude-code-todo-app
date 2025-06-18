@@ -30,4 +30,31 @@ describe("TodoList", () => {
     expect(screen.getByRole("list", { name: "Todo list" })).toBeInTheDocument();
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
   });
+
+  it("renders separator lines between todos", () => {
+    const { container } = render(<TodoList todos={mockTodos} />);
+    
+    const separators = container.querySelectorAll("hr");
+    expect(separators).toHaveLength(1); // One separator for two todos
+    
+    const separator = separators[0];
+    expect(separator).toHaveStyle({ borderColor: "rgba(110,80,73,0.2)" });
+    expect(separator).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("does not render separator after last todo", () => {
+    const singleTodo = [mockTodos[0]];
+    const { container } = render(<TodoList todos={singleTodo} />);
+    
+    const separators = container.querySelectorAll("hr");
+    expect(separators).toHaveLength(0);
+  });
+
+  it("renders correct number of separators for multiple todos", () => {
+    const threeTodos = [...mockTodos, { id: "3", title: "Test Todo 3", description: "Description 3", completed: false }];
+    const { container } = render(<TodoList todos={threeTodos} />);
+    
+    const separators = container.querySelectorAll("hr");
+    expect(separators).toHaveLength(2); // Two separators for three todos
+  });
 });
