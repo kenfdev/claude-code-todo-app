@@ -1,56 +1,36 @@
-import * as schema from "~/database/schema";
-
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { TodoList } from "../components/TodoList";
+import { AddTaskButton } from "../components/AddTaskButton";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Todo App" },
+    { name: "description", content: "A modern todo application" },
   ];
 }
 
-export async function action({ request, context }: Route.ActionArgs) {
-  const formData = await request.formData();
-  let name = formData.get("name");
-  let email = formData.get("email");
-  if (typeof name !== "string" || typeof email !== "string") {
-    return { guestBookError: "Name and email are required" };
-  }
+const todos = [
+  { id: "1", title: "Grocery Shopping", description: "Buy vegetables and fruits", completed: false },
+  { id: "2", title: "Finish Report", description: "Due by EOD", completed: false },
+  { id: "3", title: "Call Plumber", description: "Fix kitchen sink", completed: false },
+  { id: "4", title: "Workout", description: "1 hour of cardio", completed: false },
+  { id: "5", title: "Read Book", description: "Chapter 5 of 'Atomic Habits'", completed: false }
+];
 
-  name = name.trim();
-  email = email.trim();
-  if (!name || !email) {
-    return { guestBookError: "Name and email are required" };
-  }
-
-  try {
-    await context.db.insert(schema.guestBook).values({ name, email });
-  } catch (error) {
-    return { guestBookError: "Error adding to guest book" };
-  }
-}
-
-export async function loader({ context }: Route.LoaderArgs) {
-  const guestBook = await context.db.query.guestBook.findMany({
-    columns: {
-      id: true,
-      name: true,
-    },
-  });
-
-  return {
-    guestBook,
-    message: context.cloudflare.env.VALUE_FROM_CLOUDFLARE,
-  };
-}
-
-export default function Home({ actionData, loaderData }: Route.ComponentProps) {
+export default function Home() {
   return (
-    <Welcome
-      guestBook={loaderData.guestBook}
-      guestBookError={actionData?.guestBookError}
-      message={loaderData.message}
-    />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-3xl mx-auto p-6">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-[#281d1b] dark:text-gray-100">
+            Todo App
+          </h1>
+        </header>
+        <main>
+          <TodoList todos={todos} />
+        </main>
+        <AddTaskButton />
+      </div>
+    </div>
   );
 }

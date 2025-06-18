@@ -9,3 +9,7 @@
 # Cloudflare
 .mf
 .wrangler
+
+# reviews
+/reviews/*
+!reviews/.gitkeep
