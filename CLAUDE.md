@@ -27,8 +27,9 @@ A modern Todo application built with React Router v7, using Cloudflare D1 (SQLit
 ### Database
 
 - **Create D1 database**: `npx wrangler d1 create todo-db`
-- **Run migrations (local)**: `npx wrangler d1 execute todo-db --local --file=./migrations/001_init.sql`
-- **Run migrations (prod)**: `npx wrangler d1 execute todo-db --remote --file=./migrations/001_init.sql`
+- **Generate migrations**: `npm run db:generate`
+- **Run migrations (local)**: `npm run db:migrate`
+- **Run migrations (production)**: `npm run db:migrate:production`
 - **Query database (local)**: `npx wrangler d1 execute todo-db --local --command "SELECT * FROM todos"`
 
 ### Testing
@@ -44,9 +45,10 @@ A modern Todo application built with React Router v7, using Cloudflare D1 (SQLit
 
 - **Build**: `npm run build`
 - **Preview build locally**: `npm run preview`
-- **Deploy to staging**: `npx wrangler deploy --env staging`
-- **Deploy to production**: `npx wrangler deploy`
-- **View logs**: `npx wrangler tail`
+- **Deploy to production**: `npm run deploy` (includes migrations + deployment + verification)
+- **Deploy to staging**: `npm run deploy:staging`
+- **View logs**: `npm run logs`
+- **Manual deploy (advanced)**: `wrangler deploy`
 
 ## Project Structure
 
@@ -148,8 +150,10 @@ CREATE TABLE todos (
 - Environment variables are configured in Cloudflare dashboard
 - D1 database bindings configured in wrangler.toml
 - Staging environment uses separate D1 database
-- Production deployments require manual database migrations
+- **One-command deployment**: `npm run deploy` handles build, migrations, and deployment automatically
+- Production migrations are applied automatically during deployment
 - Use Cloudflare Pages for preview deployments on PRs
+- Deployment verification runs automatically after each deploy
 
 ## Common Issues & Solutions
 
