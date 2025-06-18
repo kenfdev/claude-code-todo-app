@@ -78,6 +78,10 @@ todo-app/
 - Implement proper error boundaries
 - Use semantic HTML and ARIA labels
 
+## Development Workflow
+
+- Run typecheck and lint after completing tasks and be sure they ALWAYS pass.
+
 ## Database Schema
 
 ```sql
