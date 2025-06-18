@@ -1,14 +1,9 @@
 import { TodoItem } from "./TodoItem";
-
-export interface Todo {
-  id: string;
-  title: string;
-  notes?: string | null;
-  completed: boolean;
-}
+import type { Todo, TabType } from "../types";
 
 interface TodoListProps {
   todos: Todo[];
+  activeTab?: TabType;
 }
 
 export function TodoList({ todos }: TodoListProps) {

@@ -111,4 +111,98 @@ test.describe('Todo App Critical Paths', () => {
     await expect(page.locator('input[name="title"]')).toHaveValue('')
     await expect(page.locator('textarea[name="notes"]')).toHaveValue('')
   })
+
+  test('should toggle todo completion status', async ({ page }) => {
+    // Create a new todo
+    await page.goto('/new')
+    const uniqueTitle = `Completion Test ${Date.now()}`
+    await page.locator('input[name="title"]').fill(uniqueTitle)
+    await page.getByRole('button', { name: 'Add' }).click()
+    
+    // Wait for redirect to home
+    await expect(page).toHaveURL('/')
+    
+    // Find the checkbox for the created todo
+    const todoItem = page.getByText(uniqueTitle).first()
+    await expect(todoItem).toBeVisible()
+    
+    // Get the checkbox associated with this todo
+    const checkbox = page.getByRole('checkbox', { name: new RegExp(`Mark ${uniqueTitle}`) })
+    await expect(checkbox).not.toBeChecked()
+    
+    // Click to complete the todo
+    await checkbox.click()
+    
+    // The checkbox should now be checked
+    await expect(checkbox).toBeChecked()
+    
+    // The todo text should have strikethrough styling
+    await expect(todoItem).toHaveClass(/line-through/)
+  })
+
+  test('should filter todos by completion status using tabs', async ({ page }) => {
+    // Create two todos - one to complete, one to leave incomplete
+    await page.goto('/new')
+    const incompleteTodo = `Incomplete Todo ${Date.now()}`
+    await page.locator('input[name="title"]').fill(incompleteTodo)
+    await page.getByRole('button', { name: 'Add' }).click()
+    
+    await page.goto('/new')
+    const completeTodo = `Complete Todo ${Date.now()}`
+    await page.locator('input[name="title"]').fill(completeTodo)
+    await page.getByRole('button', { name: 'Add' }).click()
+    
+    // Mark the second todo as complete
+    await page.goto('/')
+    const completeCheckbox = page.getByRole('checkbox', { name: new RegExp(`Mark ${completeTodo}`) })
+    await completeCheckbox.click()
+    await expect(completeCheckbox).toBeChecked()
+    
+    // Both todos should be visible in the incomplete tab by default
+    await expect(page.getByText(incompleteTodo)).toBeVisible()
+    await expect(page.getByText(completeTodo)).not.toBeVisible()
+    
+    // Click on completed tab
+    await page.getByRole('tab', { name: '完了' }).click()
+    
+    // Only completed todo should be visible
+    await expect(page.getByText(completeTodo)).toBeVisible()
+    await expect(page.getByText(incompleteTodo)).not.toBeVisible()
+    
+    // Go back to incomplete tab
+    await page.getByRole('tab', { name: '未完了' }).click()
+    
+    // Only incomplete todo should be visible
+    await expect(page.getByText(incompleteTodo)).toBeVisible()
+    await expect(page.getByText(completeTodo)).not.toBeVisible()
+  })
+
+  test('should persist todo completion status after page reload', async ({ page }) => {
+    // Create a new todo
+    await page.goto('/new')
+    const uniqueTitle = `Persistence Test ${Date.now()}`
+    await page.locator('input[name="title"]').fill(uniqueTitle)
+    await page.locator('textarea[name="notes"]').fill('Test persistence')
+    await page.getByRole('button', { name: 'Add' }).click()
+    
+    // Complete the todo
+    await page.goto('/')
+    const checkbox = page.getByRole('checkbox', { name: new RegExp(`Mark ${uniqueTitle}`) })
+    await checkbox.click()
+    await expect(checkbox).toBeChecked()
+    
+    // Reload the page
+    await page.reload()
+    
+    // Navigate to completed tab
+    await page.getByRole('tab', { name: '完了' }).click()
+    
+    // The todo should still be marked as complete
+    const reloadedCheckbox = page.getByRole('checkbox', { name: new RegExp(`Mark ${uniqueTitle}`) })
+    await expect(reloadedCheckbox).toBeChecked()
+    
+    // The todo should have strikethrough styling
+    const todoText = page.getByText(uniqueTitle)
+    await expect(todoText).toHaveClass(/line-through/)
+  })
 })
