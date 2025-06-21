@@ -1,15 +1,9 @@
 {
   "name": "Claude Code Todo App Sandbox",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "TZ": "${localEnv:TZ:Asia/Tokyo}"
-    }
-  },
-  "runArgs": [
-    "--cap-add=NET_ADMIN",
-    "--cap-add=NET_RAW"
+  "dockerComposeFile": [
+    "./docker-compose.yml"
   ],
+  "service": "dev",
   "customizations": {
     "vscode": {
       "extensions": [

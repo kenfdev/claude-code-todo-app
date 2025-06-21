@@ -1,91 +1,193 @@
-# Welcome to React Router!
+# Todo アプリケーション
 
-A modern, production-ready template for building full-stack React applications using React Router.
+詳細は [Youtube](https://youtu.be/GFJp1Wa1zMo) で解説しています。
 
-## Features
+React Router v7 と Cloudflare Workers を使用した、モダンでフルスタックな Todo アプリケーションです。
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## 🚀 機能
 
-## Getting Started
+### 実装済み機能
 
-### Installation
+- ✅ Todo の作成（タイトルとメモ付き）
+- ✅ Todo の完了/未完了の切り替え
+- ✅ 完了状態によるフィルタリング（未完了/完了タブ）
+- ✅ Cloudflare D1 データベースによる永続化
+- ✅ サーバーサイドレンダリング（SSR）
+- ✅ TypeScript による型安全性
+- ✅ 包括的なテストカバレッジ（単体テスト・E2E テスト）
 
-Install the dependencies:
+### 未実装機能
+
+- ❌ Todo の編集
+- ❌ Todo の削除
+- ❌ 期限日や優先度
+- ❌ テキスト検索
+- ❌ ユーザー認証
+
+## 🛠️ 技術スタック
+
+- **フロントエンド**: React Router v7, React 19, TypeScript
+- **データベース**: Cloudflare D1 (SQLite) + Drizzle ORM
+- **ランタイム**: Cloudflare Workers
+- **スタイリング**: Tailwind CSS
+- **テスト**: Vitest（単体テスト）, Playwright（E2E テスト）
+- **ビルドツール**: Vite
+
+## 📁 プロジェクト構造
+
+```
+todo-app/
+├── app/
+│   ├── routes/          # React Router v7のファイルベースルート
+│   │   ├── home.tsx     # メインのTodoリスト画面
+│   │   └── new.tsx      # Todo作成画面
+│   ├── components/      # 再利用可能なReactコンポーネント
+│   │   ├── TodoList.tsx
+│   │   ├── TodoItem.tsx
+│   │   ├── TodoCreateForm.tsx
+│   │   └── AddTaskButton.tsx
+│   ├── lib/            # ユーティリティと共有ロジック
+│   └── db/             # データベースクエリとスキーマ
+├── migrations/         # D1データベースマイグレーション
+├── tests/
+│   ├── unit/          # Vitestユニットテスト
+│   └── e2e/           # Playwright E2Eテスト
+├── public/            # 静的アセット
+├── wrangler.toml      # Cloudflare Workers設定
+├── vitest.config.ts   # Vitest設定
+└── playwright.config.ts # Playwright設定
+```
+
+## 🚀 セットアップ
+
+### 前提条件
+
+- Node.js 18 以上
+- npm または yarn
+- Wrangler CLI（Cloudflare デプロイ用）
+
+### インストール
 
 ```bash
+# 依存関係のインストール
 npm install
-```
 
-### Development
-
-Run an initial database migration:
-
-```bash
+# データベースマイグレーションの実行
 npm run db:migrate
-```
 
-Start the development server with HMR:
-
-```bash
+# 開発サーバーの起動
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+アプリケーションは `http://localhost:5173` で利用可能になります。
 
-## Building for Production
+## 📝 利用可能なコマンド
 
-Create a production build:
+### 開発
 
 ```bash
-npm run build
+npm run dev              # 開発サーバーの起動
+npm run dev:local        # ローカルD1での開発サーバー
+npm run typecheck        # TypeScriptの型チェック
+npm run lint             # ESLintの実行
+npm run format           # コードフォーマット
 ```
 
-## Deployment
+### データベース
 
-Deployment is done using the Wrangler CLI.
-
-First, you need to create a d1 database in Cloudflare.
-
-```sh
-npx wrangler d1 create <name-of-your-database>
+```bash
+npm run db:generate      # マイグレーションの生成
+npm run db:migrate       # ローカルマイグレーションの実行
+npm run db:migrate:production  # 本番マイグレーションの実行
 ```
 
-Be sure to update the `wrangler.toml` file with the correct database name and id.
+### テスト
 
-You will also need to [update the `drizzle.config.ts` file](https://orm.drizzle.team/docs/guides/d1-http-with-drizzle-kit), and then run the production migration:
-
-```sh
-npm run db:migrate-production
+```bash
+npm run test             # ユニットテストの実行
+npm run test:watch       # ウォッチモードでテスト
+npm run test:coverage    # カバレッジレポート付きテスト
+npm run test:e2e         # E2Eテストの実行
+npm run test:e2e:ui      # ヘッドモードでE2Eテスト
+npm run test:all         # 全てのテストを実行
 ```
 
-To build and deploy directly to production:
+### ビルド＆デプロイ
 
-```sh
+```bash
+npm run build            # プロダクションビルド
+npm run preview          # ビルドのプレビュー
+npm run deploy           # 本番環境へのデプロイ（マイグレーション含む）
+npm run deploy:staging   # ステージング環境へのデプロイ
+```
+
+## 🗄️ データベーススキーマ
+
+```sql
+CREATE TABLE todos (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  notes TEXT,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## 🚀 デプロイメント
+
+### Cloudflare D1 データベースの作成
+
+```bash
+# D1データベースの作成
+npx wrangler d1 create todo-db
+
+# wrangler.tomlファイルの更新が必要です
+# database_name = "todo-db"
+# database_id = "作成されたID"
+```
+
+### 本番環境へのデプロイ
+
+```bash
+# ワンコマンドデプロイ（ビルド、マイグレーション、デプロイを自動実行）
 npm run deploy
 ```
 
-To deploy a preview URL:
+## 🧪 テスト
 
-```sh
-npx wrangler versions upload
-```
+このプロジェクトは包括的なテストスイートを含んでいます：
 
-You can then promote a version to production after verification or roll it out progressively.
+- **ユニットテスト**: コンポーネントとビジネスロジックのテスト
+- **E2E テスト**: ユーザーフローの完全なテスト
+  - ホームページの表示
+  - Todo 作成フロー
+  - 完了状態の切り替え
+  - タブフィルタリング
+  - リロード後の永続性
 
-```sh
-npx wrangler versions deploy
-```
+## 🔧 開発ワークフロー
 
-## Styling
+### 必須の品質チェック
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+タスクを完了とみなす前に、以下のコマンドが全て成功することを確認してください：
+
+1. `npm run typecheck` - TypeScript の型チェック
+2. `npm run test` - 全てのユニットテストの合格
+3. `npm run build` - プロダクションビルドの成功
+
+## 📱 スクリーンショット
+
+（TODO: アプリケーションのスクリーンショットを追加）
+
+## 🤝 コントリビューション
+
+プルリクエストを歓迎します。大きな変更の場合は、まず issue を開いて変更内容について議論してください。
+
+## 📄 ライセンス
+
+[MIT](https://choosealicense.com/licenses/mit/)
 
 ---
 
-Built with ❤️ using React Router.
+React Router v7 と Cloudflare Workers で構築 ❤️

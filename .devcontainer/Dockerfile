@@ -88,3 +88,5 @@ RUN npm install -g @anthropic-ai/claude-code
 #   echo "node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
 #   chmod 0440 /etc/sudoers.d/node-firewall
 USER node
+
+CMD  socat -v TCP-LISTEN:3845,fork,reuseaddr TCP:host.docker.internal:3845 & node
