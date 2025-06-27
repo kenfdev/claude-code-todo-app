@@ -1,4 +1,3 @@
-# .github/workflows/auto-pr.yml
 name: Auto Create PR with GitHub App
 
 on:
