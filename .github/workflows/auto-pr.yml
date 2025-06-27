@@ -1,0 +1,48 @@
+name: Auto Create PR with GitHub App
+
+on:
+  push:
+    branches:
+      - 'ai/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+
+      - name: Check existing PR
+        id: check_pr
+        run: |
+          PR_COUNT=$(gh pr list --base main --head ${{ github.ref_name }} --json number --jq '. | length')
+          echo "pr_exists=$([[ $PR_COUNT -gt 0 ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - name: Create Pull Request
+        if: steps.check_pr.outputs.pr_exists == 'false'
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ github.ref_name }}" \
+            --title "AI Generated: ${{ github.ref_name }}" \
+            --body "This PR was automatically created from AI-generated code.
+
+          Branch: ${{ github.ref_name }}
+
+          Please review the changes."
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}

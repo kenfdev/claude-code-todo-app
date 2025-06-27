@@ -4,6 +4,8 @@
 
 React Router v7 と Cloudflare Workers を使用した、モダンでフルスタックな Todo アプリケーションです。
 
+注意：GitHub Actions による自動デプロイは実装していません。
+
 ## 🚀 機能
 
 ### 実装済み機能
